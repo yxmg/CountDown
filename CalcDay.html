@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>计算距离天数</title>
+	<link rel="stylesheet" href="css/bootstrap.css">
+	<style>
+		body{
+			font-family: Microsoft Yahei;
+			text-align: center;
+			background: #666;
+		}
+
+		.title{
+			margin: 0;
+			margin-top: 80px;
+		}
+
+		form{
+			display: inline-block;
+			margin-top: 80px;
+		}
+
+		.input-group{
+			width: 300px;
+			margin-bottom: 30px;
+			box-shadow: 3px 2px 5px #333;
+		}
+
+		.result{
+			margin: 0;
+			line-height: 100px;
+			background: white;
+
+		}
+
+		small{
+			display: block;
+		}
+
+		
+	</style>
+</head>
+<body><!-- 
+
+	制作个人logo图
+	整理JS冒泡事件笔记
+	 -->
+	<h1 class="title">计算距离天数<small>双击选中天数可编辑</small></h1>
+	<!-- 火狐下不支持 -->
+	<form action="">
+		<div class="input-group">
+		 	<span class="input-group-addon">开始日期</span>
+			<input class="form-control" id="start" type="date">
+		</div>
+
+		<div class="input-group">
+		 	<span class="input-group-addon">结束日期</span>
+		 	<input class="form-control" id="end" type="date">
+		</div>
+
+		<div class="input-group">
+		 	<span class="input-group-addon">距离天数</span>
+		 	<h1 class="result"><span class="days" contenteditable="true">0</span>天</h1>
+		</div>
+	</form>
+	 
+	 <script>
+	 	//测试部分
+	 	/*var str = [1,2,'3'];
+	 	console.log(str[1]);
+	 	console.log(str.valueOf());*/
+	 	//String 原始类型？数组？
+	 	//两个String
+	 	
+	 	/*测试部分结束*/
+	 	
+
+		//获取DOM对象
+	 	var start = document.querySelector('#start');
+	 	var end = document.querySelector('#end');
+	 	var result = document.querySelector('.result');
+	 	var days = document.querySelector('.days');
+
+	 	var now = new Date();
+
+		start.value = DateToStr(now);
+		end.value = DateToStr(now);
+
+	 	start.onchange = function () {
+	 		clacDay(end.value,this.value);
+	 	}
+
+	 	end.oninput = function () {
+	 		clacDay(this.value,start.value);
+	 	}
+
+	 	result.oninput = function () {
+	 		var ChangeR = result.innerHTML;
+	 		var interval = takeNum(ChangeR);
+	 		var dateStart = StrToDate(start.value);
+
+	 		dateStart.setDate(dateStart.getDate() + interval);
+	 		end.value = DateToStr(dateStart);
+	 	}
+	 	
+	 	//函数部分
+	 	//提取数字
+	 	function takeNum(str) {
+	 		var num = parseInt(str.replace(/[^0-9]/ig,''));
+	 		return num;
+	 	}
+	 	
+	 	
+	 	//日期转成 y-m-d
+	 	function DateToStr(date) {
+	 		var Day = ('0' + date.getDate()).slice(-2);
+	 		var Month = ('0' + (date.getMonth()+1)).slice(-2);
+			// 注：getMonth这里加1是因为JS中月份是从0开始的。
+	 		var Year = date.getFullYear();
+			var strdate = Year +'-'+ Month +'-'+ Day;
+			return strdate;
+	 	}
+	 	
+	 	//计算时间差
+	 	function clacDay(start,end) {
+	 		var D_start = '';
+	 		var D_end = '';
+
+	 		if (start!=='' && end!=='') {
+	 			D_start = StrToDate(start);
+	 			D_end = StrToDate(end);
+	 			day = (D_start - D_end) / 1000 / 60 / 60 / 24;
+	 		}
+	 		days.innerHTML = day;
+	 	}
+
+	 	function StrToDate(str){
+	 		var date = new Date();
+	 		str.replace(/-/g,'/');
+	 		date = new Date(str);
+	 		return date;
+	 	}
+
+	 	function getWeek(date) {
+	 		var week = [7];
+	 		week[0] = '星期日';
+	 		week[1] = '星期一';
+	 		week[2] = '星期二';
+	 		week[3] = '星期三';
+	 		week[4] = '星期四';
+	 		week[5] = '星期五';
+	 		week[6] = '星期六';
+
+	 		console.log(week[date.getDay()]);
+	 	}
+
+	 	getWeek(new Date());
+
+	 	
+
+	 	//总结：
+	 	//1、onchange、oninput内容改变事件
+	 	//（onchange改变后失去焦点触发，oninput改变时触发）
+	 	//
+	 	//2、正则表达式初识
+	 	//（//包裹检索内容，g全局检索，i区分大小写，
+	 	//replace函数（repx(可多个)，字符串））
+	 	//
+	 	//3、date的各种函数
+	 	//	1.new Date();创建一个date对象（日期为今天）
+	 	//	2.格式化日期
+	 	//		getDate(date)：获取几日
+	 	//		getMonth(date)：获取月份，从0开始，所以一般情况下输出前需要+1
+	 	//		getFullYear(date)：获取年份
+	 	//		getDay(date)：获取星期几，0代表星期天，1代表星期一，以此类推。
+	 	//		
+	 	//4、工具函数思想
+	 	//（尽量地多使用函数封装功能）
+	 	//
+	 	//5、input和date相关
+	 	//	1.input:date：value值的格式为yyyy-M-d
+	 	//	2.date类型：运算后转为数字类型,可以通过setDate和new Date()转回Date
+	 </script>
+</body>
+</html>
